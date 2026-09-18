@@ -1,0 +1,40 @@
+name: GitHub Metrics
+on:
+  # 手动触发 + 每天北京时间0点自动更新
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate metrics
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          output: 'metrics.svg'
+          base: on
+          base_title: "yooongchun's stats"
+          base_icons: true
+          # 主题，你之前喜欢 github_dark_dimmed，这里用近似暗色
+          base_theme: github-dark
+          # 可选模块，按需开关
+          plugin_repositories: on
+          plugin_languages: on
+          plugin_languages_limit: 6
+          plugin_contributions: on
+          plugin_contributions_sections: "total,commits,prs,issues"
+
+      - name: Commit & Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add metrics.svg
+          git commit -m "📊 Auto update metrics" || true
+          git push
