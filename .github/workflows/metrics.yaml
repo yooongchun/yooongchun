@@ -1,4 +1,6 @@
 name: Generate Github Stats Card
+permissions:
+  contents: write # 核心！允许action提交/修改仓库文件
 on:
   schedule:
     - cron: '0 0 * * *' # UTC时间，每天0点自动执行更新
